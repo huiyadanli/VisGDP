@@ -92,7 +92,7 @@ public class PAppletMDS extends PApplet {
 				percent[2] += Data.area[provIndex + 1].percent[5][GlobalVariables.year
 						- Data.startYear];
 				//判断有没有海南省
-				if(provIndex == 29) {
+				if(provIndex == 29 && GlobalVariables.year < 1987) {
 					haveHaiNan= true;
 				}
 			}
