@@ -16,15 +16,16 @@ public class PAppletChinaMap extends PApplet {
 	ColorMappingFactory colorFactory = new ColorMappingFactory();
 	ColorMapping colorMapping = null;
 	PGraphics pgMap, pgColorBar;
-	int prevYear = -1;
-
+	int prevYear = -1;		//记录当前选择年份
+	int colorMappingStyle=-1;  //记录当前颜色模式
+	
 	float hue = 3843;
 	RShape chinaMap, provinceMap;
 	String cityCompare = null;
 	ProvinceName pName = new ProvinceName();
 	String clickedArea = "", overArea = "";
 	int clickedAreaIndex = 0;
-
+	int offsetX=100;
 	String cityName[] = { "Xin_Jiang", "Xi_Zang", "Qing_Hai", "Yun_Nan",
 			"Gan_Su", "Si_Chuan", "Ning_Xia", "Chong_Qing", "Gui_Zhou",
 			"Guang_Xi", "Shan3_Xi", "Hai_Nan", "Nei_Meng_Gu", "Hu_Nan",
@@ -91,7 +92,7 @@ public class PAppletChinaMap extends PApplet {
 		pgMap.background(0, 0, 100);
 		pgMap.endDraw();
 
-		pgColorBar = createGraphics(200, 400);
+		pgColorBar = createGraphics(250, 400);
 		drawColorBar(pgColorBar);
 	}
 
@@ -103,12 +104,12 @@ public class PAppletChinaMap extends PApplet {
 			drawMap(pgMap);
 			prevYear = GlobalVariables.year;
 		}
-		image(pgMap, 0, 0);
+		image(pgMap, offsetX, 0);
 
-		highlightArea();
+		//highlightArea();
 		
 		if (GlobalVariables.selectCityList3.size() > 0) {
-			fill(129, 14, 142);
+			fill(129, 14, 142); 
 			for (int i = 0; i < GlobalVariables.selectCityList3.size(); i++) {
 				provinceMap = chinaMap
 						.getChild(pName.provinceEnglishName[GlobalVariables.selectCityList3
@@ -116,14 +117,7 @@ public class PAppletChinaMap extends PApplet {
 				RG.shape(provinceMap);
 			}
 		}
-		
-		//stroke(238);
-		//strokeWeight(5);
-		//line(640,0,640,600);
-		image(pgColorBar, 645, 210);
-		//stroke(0);
-		//strokeWeight(1);
-
+		image(pgColorBar, 85, 400);
 		showProvName();
 	}
 
@@ -137,6 +131,11 @@ public class PAppletChinaMap extends PApplet {
 		System.out.println("当前颜色映射方案为：" + GlobalVariables.colorMappingStyle);
 		// colorMapping.transferColorToHsl(0, 250);
 		drawMap(pgMap);
+		if(colorMappingStyle != GlobalVariables.colorMappingStyle)
+		{
+			colorMappingStyle=GlobalVariables.colorMappingStyle;
+			drawColorBar(pgColorBar);
+		}
 	}
 
 	public void drawMap(PGraphics pg) {
@@ -181,7 +180,29 @@ public class PAppletChinaMap extends PApplet {
 			// System.out.println("Point:"+"---"+hh);
 
 			pg.fill(hh, 100, 100);
-
+			
+			if(cityCompare != null)
+			{
+				if(provinceEnglishName==cityCompare)
+					pg.fill(280,100,100); // 选中颜色
+				for (int j = 0; j < 20; j++) {
+					if (Degree == 1) {
+						if (AdjacencyCity1[clickedAreaIndex][j] >= 0) {
+							if(provinceEnglishName==cityName[AdjacencyCity1[clickedAreaIndex][j]])
+								pg.fill(280, 50, 100); // 一度省份颜色
+						} 
+						else
+							break;
+					}
+				}
+			}
+			/*//处理第二第三窗口与第一窗口的交互
+			if (GlobalVariables.selectCityList3.size() > 0) {
+				for (int j = 0; j < GlobalVariables.selectCityList3.size(); j++) {
+					if(i==j+1);
+						pg.fill(129, 14, 142);
+				}
+			}*/
 			// int[] col = HSLAndRGB.HSL2RGB(b, 1, 0.5);
 			// fill(col[0], col[1], col[2]);
 
@@ -205,9 +226,9 @@ public class PAppletChinaMap extends PApplet {
 		}
 
 		provinceMap = chinaMap.getChild(cityCompare);
+		
 		fill(129, 14, 142); // 选中颜色
 		RG.shape(provinceMap);
-
 		int i, j;
 		for (i = 0; i < 34; i++) {
 			if (cityCompare == cityName[i])
@@ -222,6 +243,7 @@ public class PAppletChinaMap extends PApplet {
 							.getChild(cityName[AdjacencyCity1[i][j]]);
 					fill(169, 88, 167); // 一度省份颜色
 					RG.shape(provinceMap);
+					//RG.shape(provinceMap,provinceMap.getX()+50,provinceMap.getY());
 				} else
 					break;
 			} else if (Degree == 2) {
@@ -250,7 +272,7 @@ public class PAppletChinaMap extends PApplet {
 		}
 	}
 
-	public void changeDegree(int x) {
+	public void changeDegree(int x) {	//改变度数
 		Degree = x;
 		GlobalVariables.selectCity = null;
 		GlobalVariables.selectCityList1.clear();
@@ -281,11 +303,13 @@ public class PAppletChinaMap extends PApplet {
 					break;
 			}
 		}
+		if (cityCompare!=null )//当选择了省份时
+			drawMap(pgMap);
 		// fMain.drawMDS();
 	}
 
 	public void mouseMoved() {
-		RPoint p = new RPoint(mouseX, mouseY);
+		RPoint p = new RPoint(mouseX-offsetX, mouseY);
 		int i;
 		for (i = 0; i < chinaMap.countChildren(); i++) {
 			if (chinaMap.children[i].contains(p)) {
@@ -310,9 +334,10 @@ public class PAppletChinaMap extends PApplet {
 			if (GlobalVariables.provOrYear == 1) {
 				fMain.drawMDS();
 			}
+			drawMap(pgMap);
 			return;
 		}
-		RPoint p = new RPoint(mouseX, mouseY);
+		RPoint p = new RPoint(mouseX-offsetX, mouseY);
 		for (int i = 0; i < chinaMap.countChildren(); i++) {
 			if (chinaMap.children[i].contains(p)) {
 				if (i == cityName.length - 1) {
@@ -354,6 +379,8 @@ public class PAppletChinaMap extends PApplet {
 				}
 			}
 		}
+		if(cityCompare!=null)
+			drawMap(pgMap);
 	}
 
 	public void showProvName() {
@@ -380,19 +407,54 @@ public class PAppletChinaMap extends PApplet {
 		}
 	}
 
-	public void drawColorBar(PGraphics pg) {
+	public void drawColorBar(PGraphics pg) {	//绘制第一窗口colorBar
+		
 		pg.beginDraw();
 		pg.colorMode(HSB, 360, 100, 100);
+
 		int weight = 2;
 		pg.strokeWeight(1);
-		for (int i = 0; i < 120; i++) {
-			pg.stroke(i, 100, 100);
-			for (int j = 0; j < weight; j++) {
-				pg.line(60, i * weight- j, 100, i * weight - j);
+
+		if(colorMapping == null) return ;
+		int[] colorCount=new int[256];
+		for(int i=0; i<122; i++)
+			colorCount[i]=0;
+		for (int i = 0; i < Data.area.length; i++)
+		{
+			if (Data.area[i].province.equals("中国"))
+				continue;
+			for (int j = 0; j < Data.yearCount; j++) 
+			{
+				double b = colorMapping.getColorData(i, j);
+				int h=(int)b;
+				if(h>=0&&h<=120) colorCount[h]++;
 			}
 		}
+		int maxn=0;
+		for(int i=0; i<=120; i++)
+			maxn=Math.max(maxn, colorCount[i]);
+		pg.strokeWeight(1);
+		for (int i = 0; i <= 120; i++) {
+			
+			pg.stroke(0,0,100);
+			for(int j=0; j < weight; j++)
+				pg.line(i * weight-j,  0 ,  i * weight-j , 100);
 
-		pg.fill(100, 10, 50);
+			pg.stroke(0);
+			for(int j=0; j < weight; j++)
+				pg.line(i *weight-j, (float)(100-1.0*colorCount[i]/maxn*100) ,  i * weight-j , 100);
+
+		}
+		
+		
+		for (int i = 0; i <= 120; i++) {
+			pg.stroke(120-i, 100, 100);
+			for (int j = 0; j < weight; j++) {
+				pg.line(i * weight- j, 100 ,  i * weight - j, 120);
+			}
+		}
+		
+		/*pg.fill(100, 10, 50);
 		pg.text("9,9000", 10, 10);
 		pg.text("         0", 10, 120 * weight);
 		pg.text("PCGDP", 60, 260);
@@ -401,7 +463,7 @@ public class PAppletChinaMap extends PApplet {
 		// pg.line(60, 0, 60, 119 * weight); // 竖线
 		pg.strokeWeight(2);
 		pg.line(59, 1, 55, 1); // 小横线 （高）
-		pg.line(59, 118 * weight + 1, 55, 118 * weight + 1); // 小横线 （低）
+		pg.line(59, 118 * weight + 1, 55, 118 * weight + 1); // 小横线 （低）*/
 		pg.endDraw();
 	}
 }

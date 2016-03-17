@@ -14,7 +14,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-//ĞŞ¸Ä²âÊÔ
+//ĞŞ¸Ä²âÊÔ2
 public class FrameMain extends JFrame implements ActionListener, ChangeListener,WindowListener{
 	
 	JMenuBar menuBar;
