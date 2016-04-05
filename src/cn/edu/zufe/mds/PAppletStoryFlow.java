@@ -346,7 +346,7 @@ public class PAppletStoryFlow extends PApplet {
 			for (StoryLine line : lineInCluster) {
 				line.highlightNoCurve();
 			}
-			System.out.println(entropyIn + " " + entropyOut);
+			//System.out.println(entropyIn + " " + entropyOut);
 		}
 	}
 
