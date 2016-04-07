@@ -99,15 +99,16 @@ public class PAppletChinaMap extends PApplet {
 	public void draw() {
 
 		background(255);
-
-		if (prevYear != GlobalVariables.year) {
-			drawMap(pgMap);
+		if( prevYear != GlobalVariables.year || GlobalVariables.mdsOrStoryFlowClick == true)
+		{
+			GlobalVariables.mdsOrStoryFlowClick = false;
 			prevYear = GlobalVariables.year;
+			drawMap(pgMap);
 		}
 		image(pgMap, offsetX, 0);
 
 		//highlightArea();
-		
+		/*
 		if (GlobalVariables.selectCityList3.size() > 0) {
 			fill(129, 14, 142); 
 			for (int i = 0; i < GlobalVariables.selectCityList3.size(); i++) {
@@ -116,7 +117,7 @@ public class PAppletChinaMap extends PApplet {
 								.get(i) + 1]);
 				RG.shape(provinceMap);
 			}
-		}
+		}*/
 		image(pgColorBar, 85, 400);
 		showProvName();
 	}
@@ -196,13 +197,13 @@ public class PAppletChinaMap extends PApplet {
 					}
 				}
 			}
-			/*//处理第二第三窗口与第一窗口的交互
+			//处理第二第三窗口与第一窗口的交互
 			if (GlobalVariables.selectCityList3.size() > 0) {
 				for (int j = 0; j < GlobalVariables.selectCityList3.size(); j++) {
-					if(i==j+1);
-						pg.fill(129, 14, 142);
+					if(i==GlobalVariables.selectCityList3.get(j)+1)
+						pg.fill(200, 70, 100);
 				}
-			}*/
+			}
 			// int[] col = HSLAndRGB.HSL2RGB(b, 1, 0.5);
 			// fill(col[0], col[1], col[2]);
 

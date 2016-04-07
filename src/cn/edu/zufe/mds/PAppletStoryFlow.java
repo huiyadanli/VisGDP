@@ -66,6 +66,7 @@ public class PAppletStoryFlow extends PApplet {
 	}
 
 	public void mousePressed() {
+		GlobalVariables.mdsOrStoryFlowClick = true;
 		PAppletMDS.mouseIn = -1;
 		if (allYear[0] == null) {
 			return;

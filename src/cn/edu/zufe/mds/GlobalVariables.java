@@ -27,5 +27,6 @@ public class GlobalVariables {
 	public static ArrayList<ArrayList<Integer>>[] clusters =new ArrayList[Data.yearCount];
 	public static int colorMappingStyle=1; //ÑÕÉ«Ó³ÉäÄ£Ê½
 	
+	public static boolean mdsOrStoryFlowClick = false;
 	
 }

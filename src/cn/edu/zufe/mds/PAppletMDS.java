@@ -12,6 +12,7 @@ import cn.edu.zufe.mds.PAppletStoryFlow.StoryLine;
 import mdsj.MDSJ;
 import processing.core.PApplet;
 import processing.core.PGraphics;
+import processing.core.PShape;
 
 public class PAppletMDS extends PApplet {
 	double[][] pos = new double[63][2];
@@ -27,6 +28,7 @@ public class PAppletMDS extends PApplet {
 	ArrayList<DataPoint> dpoints = new ArrayList<DataPoint>();// 类族中点集链表
 	List<Cluster> clusters = new ArrayList<Cluster>();// 类族链表
 	double ClusterDis = 50; // 聚类终止条件欧几里德距离
+	PShape s;
 
 	public void setup() {
 		w = 500;
@@ -65,15 +67,12 @@ public class PAppletMDS extends PApplet {
 					ellipse((float) (overallX + px), (float) py, 5, 5); // 聚类圈中心点
 					stroke(100, 0, 50); // 聚类中连线的颜色
 					// 点之间的连线
-					line((float) (overallX + px), (float) py,
-							(float) (overallX + tempdp.dimensioin[0]),
+					line((float) (overallX + px), (float) py, (float) (overallX + tempdp.dimensioin[0]),
 							(float) tempdp.dimensioin[1]);
 				}
 
-				double tmpDis = Math.sqrt((tempdp.dimensioin[0] - px)
-						* (tempdp.dimensioin[0] - px)
-						+ (tempdp.dimensioin[1] - py)
-						* (tempdp.dimensioin[1] - py));
+				double tmpDis = Math.sqrt((tempdp.dimensioin[0] - px) * (tempdp.dimensioin[0] - px)
+						+ (tempdp.dimensioin[1] - py) * (tempdp.dimensioin[1] - py));
 				if (disR < tmpDis) {
 					disR = tmpDis;
 				}
@@ -85,155 +84,227 @@ public class PAppletMDS extends PApplet {
 				}
 				// 累加第一、二、三产业的占比
 
-				percent[0] += Data.area[provIndex + 1].percent[1][GlobalVariables.year
-						- Data.startYear];
-				percent[1] += Data.area[provIndex + 1].percent[2][GlobalVariables.year
-						- Data.startYear];
-				percent[2] += Data.area[provIndex + 1].percent[5][GlobalVariables.year
-						- Data.startYear];
-				//判断有没有海南省
-				if(provIndex == 29) {
-					haveHaiNan= true;
+				percent[0] += Data.area[provIndex + 1].percent[1][GlobalVariables.year - Data.startYear];
+				percent[1] += Data.area[provIndex + 1].percent[2][GlobalVariables.year - Data.startYear];
+				percent[2] += Data.area[provIndex + 1].percent[5][GlobalVariables.year - Data.startYear];
+				// 判断有没有海南省
+				if (provIndex == 29 && GlobalVariables.year < 1987) {
+					haveHaiNan = true;
 				}
 			}
 
 			if (GlobalVariables.pointOrPie == 0) {
+				noStroke();
 				// 聚类圈的颜色
 				if (clicked) {
 					GlobalVariables.selectCityList3.clear();
 					for (DataPoint tempdp : clickedCluster) {
-						GlobalVariables.selectCityList3.add(Integer
-								.parseInt(tempdp.getDataPointName()));
+						GlobalVariables.selectCityList3.add(Integer.parseInt(tempdp.getDataPointName()));
 					}
 					fill(40, 100, 90, 40);
 					stroke(40, 100, 90, 40);
 				} else {
+
 					fill(200, 100, 90, 40);
 					stroke(200, 100, 90, 40);
 				}
 				// 画出聚类圈
-				ellipse((float) (overallX + px), (float) py,
-						(float) disR * 2 + 40, (float) disR * 2 + 40);
+				ellipse((float) (overallX + px), (float) py, (float) disR * 2 + 40, (float) disR * 2 + 40);
 			} else {
+				// s = createShape();
+				float circle_PointX = (float) (overallX + px);
+				float circle_PointY = (float) py;
 				int provNum = tempDps.size();
-				if(haveHaiNan) {
-					provNum -=1;
+				if (haveHaiNan) {
+					provNum -= 1;
 				}
+				float R = (float) ((disR * 2 + 40) / (1 + 0.2)); // 由于采取的是用线的粗细来代替圆环，而需要缩小半径来保持与原圆的大小(stroke是向两边扩展粗细)
 				float angle1 = (float) (2 * PI * percent[0] / provNum);
 				float angle2 = angle1 + (float) (2 * PI * percent[1] / provNum);
 				float angle3 = angle2 + (float) (2 * PI * percent[2] / provNum);
-				fill(200, 100, 90, 40);
-				arc((float) (overallX + px), (float) py, (float) disR * 2 + 40,
-						(float) disR * 2 + 40, 0, angle1, PIE);
-				fill(20, 100, 90, 40);
-				arc((float) (overallX + px), (float) py, (float) disR * 2 + 40,
-						(float) disR * 2 + 40, angle1, angle2, PIE);
-				fill(120, 100, 90, 40);
-				arc((float) (overallX + px), (float) py, (float) disR * 2 + 40,
-						(float) disR * 2 + 40, angle2, angle3, PIE);
+
+				noFill();
+				strokeCap(SQUARE);
+				strokeWeight((float) ((disR * 2 + 40) * 0.3));
+
+				stroke(200, 100, 90, 40);		//按比例画圆环
+				arc(circle_PointX, circle_PointY, R, R, 0, angle1);	
+				stroke(20, 100, 90, 40);
+				arc(circle_PointX, circle_PointY, R, R, angle1, angle2);
+				stroke(120, 100, 90, 40);
+				arc(circle_PointX, circle_PointY, R, R, angle2, angle3);
+				/*
+				 * fill(200, 100, 90, 40); arc((float) (overallX + px), (float)
+				 * py, (float) disR * 2 + 40, (float) disR * 2 + 40, 0, angle1,
+				 * PIE);
+				 * 
+				 * fill(20, 100, 90, 40); arc((float) (overallX + px), (float)
+				 * py, (float) disR * 2 + 40, (float) disR * 2 + 40, angle1,
+				 * angle2, PIE); fill(120, 100, 90, 40); arc((float) (overallX +
+				 * px), (float) py, (float) disR * 2 + 40, (float) disR * 2 +
+				 * 40, angle2, angle3, PIE);
+				 * 
+				 * fill(0,0,100); //实现展示圆环。。但是有很大BUG ellipse((float) (overallX +
+				 * px), (float) py, (float) ((disR * 2+40)*0.6), (float) ((disR
+				 * * 2+40)*0.6) );
+				 */
+
+				// 实现指针指向
+				
+				stroke(0);
+				strokeWeight(2);
+				float edX;
+				float edY;
+				float pointer;
+				float tmp_pointer=0;
+				float l = (float)(0.5 * R);
+				float ag1 = angle1;
+				float ag2 = angle2-angle1;
+				float ag3 = 2*PI - ag1 - ag2;
+				if (ag1 > ag2 && ag1 >ag3) {
+					float disAg = Math.abs(ag2 - ag3); // 求得弧度差值
+					 pointer = ag1 / 2;
+					 tmp_pointer = pointer;
+				/*	if (ag2 > ag3)
+						tmp_pointer = pointer + disAg;
+					else
+						tmp_pointer = pointer - disAg;*/
+				}
+				else if(ag2 > ag1 && ag2 > ag3)
+				{
+					float disAg = Math.abs(ag1 - ag3); // 求得弧度差值
+					 pointer = ag2 / 2;
+					 tmp_pointer = pointer + ag1;
+					/*if (ag3 > ag1)
+						tmp_pointer = pointer + disAg;
+					else
+						tmp_pointer = pointer - disAg;*/
+				}
+				else 
+				{
+					float disAg = Math.abs(ag1 - ag2);
+					pointer = ag3 / 2;
+					tmp_pointer = pointer + ag1 +ag2;
+					/*if(ag1 > ag2)
+						tmp_pointer = pointer + disAg;
+					else
+						tmp_pointer = pointer - disAg;*/
+				}
+				if (tmp_pointer < PI / 2) {
+					edX = (float) (circle_PointX + l * Math.cos(tmp_pointer));
+					edY = (float) (circle_PointY + l * Math.sin(tmp_pointer));
+				} else if (tmp_pointer < PI) {
+					tmp_pointer -= (PI / 2);
+					edX = (float) (circle_PointX - l * Math.sin(tmp_pointer));
+					edY = (float) (circle_PointY + l * Math.cos(tmp_pointer));
+				} else if (tmp_pointer < (PI * 3 / 2)) {
+					tmp_pointer -= PI;
+					edX = (float)(circle_PointX - l * Math.cos(tmp_pointer));
+					edY = (float)(circle_PointY - l * Math.sin(tmp_pointer));
+				} else {
+					tmp_pointer -= (PI * 3 / 2);
+					edX = (float)(circle_PointX + l * Math.sin(tmp_pointer));
+					edY = (float)(circle_PointY - l * Math.cos(tmp_pointer));
+				}
+				line(circle_PointX, circle_PointY, edX, edY);
+				
 			}
 
-		}
+	}
 
-		ArrayList<StoryLine> lines = new ArrayList<StoryLine>();
-		boolean exist = false;
-		if (PAppletStoryFlow.allYear[0] != null) {
-			lines = (ArrayList<StoryLine>) PAppletStoryFlow.allYear[GlobalVariables.year
-					- Data.startYear].lineInYear.clone();
-			Collections.sort(lines, new SortByProvIndex());
-			exist = true;
-		}
+	ArrayList<StoryLine> lines = new ArrayList<StoryLine>();
+	boolean exist = false;if(PAppletStoryFlow.allYear[0]!=null)
 
-		// 画点
-		if (GlobalVariables.pointOrPie == 0) {
-			if (GlobalVariables.provOrYear == 0) {
-				for (int i = 0; i < Data.provinceCount - 1; i++) {
-					int posX = (int) (pos[i][0] * (w - 60) + 10);
-					int posY = (int) (pos[i][1] * (h - 60) + 10);
-					// 点的颜色
-					if (exist) {
-						fill(lines.get(i).hIn, lines.get(i).sIn,
-								lines.get(i).bIn);
-					} else {
-						// fill(255,153,0);
-						fill(30, 100, 100);
-					}
+	{
+		lines = (ArrayList<StoryLine>) PAppletStoryFlow.allYear[GlobalVariables.year - Data.startYear].lineInYear
+				.clone();
+		Collections.sort(lines, new SortByProvIndex());
+		exist = true;
+	}
 
-					if (GlobalVariables.selectCity != null
-							&& i == pName
-									.GetProvinceIndex(GlobalVariables.selectCity) - 1) {
-						fill(293, 90, 55); // 选中省份颜色
-					}
-					if (GlobalVariables.selectCityList1.size() > 0) {
-						for (int j = 0; j < GlobalVariables.selectCityList1
-								.size(); j++) {
-							if (i == pName
-									.GetProvinceIndex(GlobalVariables.selectCityList1
-											.get(j)) - 1) {
-								fill(302, 47, 66); // 一度
-								break;
-							}
-						}
-					}
-					if (GlobalVariables.selectCityList2.size() > 0) {
-						for (int j = 0; j < GlobalVariables.selectCityList2
-								.size(); j++) {
-							if (i == pName
-									.GetProvinceIndex(GlobalVariables.selectCityList2
-											.get(j)) - 1) {
-								fill(271, 35, 95); // 二度
-								break;
-							}
-						}
-					}
-					// System.out.println("  " + pos[i][0] + " " + pos[i][1]);
-					ellipse(overallX + posX, posY, 20, 20);
-					fill(0, 0, 0);
-				}
-			} else if (GlobalVariables.provOrYear == 1) {
-				for (int i = 0; i < Data.yearCount; i++) {
-					int posX = (int) (pos[i][0] * (w - 60) + 10);
-					int posY = (int) (pos[i][1] * (h - 60) + 10);
-					// 点的颜色
+	// 画点
+	if(GlobalVariables.pointOrPie==0)
+	{
+		if (GlobalVariables.provOrYear == 0) {
+			for (int i = 0; i < Data.provinceCount - 1; i++) {
+				int posX = (int) (pos[i][0] * (w - 60) + 10);
+				int posY = (int) (pos[i][1] * (h - 60) + 10);
+				// 点的颜色
+				if (exist) {
+					fill(lines.get(i).hIn, lines.get(i).sIn, lines.get(i).bIn);
+				} else {
+					// fill(255,153,0);
 					fill(30, 100, 100);
-
-					if (i == GlobalVariables.year - Data.startYear) {
-						fill(293, 90, 55); // 选中年份颜色
-					}
-
-					ellipse(overallX + posX, posY, 20, 20);
-					fill(0, 0, 0);
 				}
+
+				if (GlobalVariables.selectCity != null && i == pName.GetProvinceIndex(GlobalVariables.selectCity) - 1) {
+					fill(293, 90, 55); // 选中省份颜色
+				}
+				if (GlobalVariables.selectCityList1.size() > 0) {
+					for (int j = 0; j < GlobalVariables.selectCityList1.size(); j++) {
+						if (i == pName.GetProvinceIndex(GlobalVariables.selectCityList1.get(j)) - 1) {
+							fill(302, 47, 66); // 一度
+							break;
+						}
+					}
+				}
+				if (GlobalVariables.selectCityList2.size() > 0) {
+					for (int j = 0; j < GlobalVariables.selectCityList2.size(); j++) {
+						if (i == pName.GetProvinceIndex(GlobalVariables.selectCityList2.get(j)) - 1) {
+							fill(271, 35, 95); // 二度
+							break;
+						}
+					}
+				}
+				// System.out.println(" " + pos[i][0] + " " + pos[i][1]);
+				ellipse(overallX + posX, posY, 20, 20);
+				fill(0, 0, 0);
+			}
+		} else if (GlobalVariables.provOrYear == 1) {
+			for (int i = 0; i < Data.yearCount; i++) {
+				int posX = (int) (pos[i][0] * (w - 60) + 10);
+				int posY = (int) (pos[i][1] * (h - 60) + 10);
+				// 点的颜色
+				fill(30, 100, 100);
+
+				if (i == GlobalVariables.year - Data.startYear) {
+					fill(293, 90, 55); // 选中年份颜色
+				}
+
+				ellipse(overallX + posX, posY, 20, 20);
+				fill(0, 0, 0);
 			}
 		}
+	}
 
-		// 显示省份名字
-		if (mouseOn != -1 && GlobalVariables.pointOrPie == 0) {
-			String provName = pName.provinceChineseName[mouseOn + 1];
-			int len = 15;
-			if (Language.languageType == 0) {
-				provName = pName.provinceChineseName[mouseOn + 1];
-				len = 15;
-			} else if (Language.languageType == 1) {
-				provName = pName.provinceEnglishName[mouseOn + 1]
-						.replace("_", "").replace("1", "").replace("3", "");
-				len = 8;
-			}
-			strokeWeight(1);
-			int offsetX = 20, offsetY = 20;
-			if (mouseX + 20 + provName.length() * len > w) {
-				offsetX = offsetX - 40 - provName.length() * len;
-			}
-			if (mouseY + 40 > h) {
-				offsetY = -20;
-			}
+	// 显示省份名字
+	if(mouseOn!=-1&&GlobalVariables.pointOrPie==0)
 
-			fill(0, 0, 100);
-			rect(mouseX + offsetX, mouseY + offsetY, provName.length() * len,
-					20);
-			fill(0);
-			text(provName, mouseX + offsetX + 5, mouseY + offsetY + 15);
+	{
+		String provName = pName.provinceChineseName[mouseOn + 1];
+		int len = 15;
+		if (Language.languageType == 0) {
+			provName = pName.provinceChineseName[mouseOn + 1];
+			len = 15;
+		} else if (Language.languageType == 1) {
+			provName = pName.provinceEnglishName[mouseOn + 1].replace("_", "").replace("1", "").replace("3", "");
+			len = 8;
 		}
+		strokeWeight(1);
+		int offsetX = 20, offsetY = 20;
+		if (mouseX + 20 + provName.length() * len > w) {
+			offsetX = offsetX - 40 - provName.length() * len;
+		}
+		if (mouseY + 40 > h) {
+			offsetY = -20;
+		}
+
+		fill(0, 0, 100);
+		rect(mouseX + offsetX, mouseY + offsetY, provName.length() * len, 20);
+		fill(0);
+		text(provName, mouseX + offsetX + 5, mouseY + offsetY + 15);
+	}
+
 	}
 
 	public void mouseMoved() {
@@ -257,12 +328,13 @@ public class PAppletMDS extends PApplet {
 		GlobalVariables.selectCityList3.clear();
 		mouseIn = -1;
 		if (mouseButton == LEFT) {
+
+			GlobalVariables.mdsOrStoryFlowClick = true;
 			for (int i = 0; i < Data.provinceCount - 1; i++) {
 				int posX = (int) (pos[i][0] * (w - 60) + 10);
 				int posY = (int) (pos[i][1] * (h - 60) + 10);
-				double dis = Math.sqrt((mouseX - posX - overallX)
-						* (mouseX - posX - overallX) + (mouseY - posY)
-						* (mouseY - posY));
+				double dis = Math.sqrt(
+						(mouseX - posX - overallX) * (mouseX - posX - overallX) + (mouseY - posY) * (mouseY - posY));
 				if (dis <= 10) {
 					mouseIn = i;
 					break;
@@ -284,9 +356,8 @@ public class PAppletMDS extends PApplet {
 
 		for (int i = 0; i < cnt; i++) // pos数组读入
 		{
-			double[] tmp = { pos[i][0] * (w - 60) + 10,
-					pos[i][1] * (h - 60) + 10 };
-			// System.out.println(tmp[0] + "  " + tmp[1]);
+			double[] tmp = { pos[i][0] * (w - 60) + 10, pos[i][1] * (h - 60) + 10 };
+			// System.out.println(tmp[0] + " " + tmp[1]);
 			dpoints.add(new DataPoint(tmp, i + ""));
 		}
 
@@ -321,7 +392,8 @@ public class PAppletMDS extends PApplet {
 			// System.out.println(output[0][i] + " " + output[1][i]);
 			pos[i][0] = (output[0][i] - minPosX) / (maxPosX - minPosX);
 			pos[i][1] = (output[1][i] - minPosY) / (maxPosY - minPosY);
-			// System.out.println("pos["+i+"][0] = "+pos[i][0]+" pos["+i+"][1] = "+pos[i][1]);
+			// System.out.println("pos["+i+"][0] = "+pos[i][0]+" pos["+i+"][1] =
+			// "+pos[i][1]);
 		}
 
 		startCluster();
@@ -359,7 +431,8 @@ public class PAppletMDS extends PApplet {
 			// System.out.println(output[0][i] + " " + output[1][i]);
 			posTmp[i][0] = (output[0][i] - minPosX) / (maxPosX - minPosX);
 			posTmp[i][1] = (output[1][i] - minPosY) / (maxPosY - minPosY);
-			// System.out.println("pos["+i+"][0] = "+pos[i][0]+" pos["+i+"][1] = "+pos[i][1]);
+			// System.out.println("pos["+i+"][0] = "+pos[i][0]+" pos["+i+"][1] =
+			// "+pos[i][1]);
 		}
 
 		ArrayList<DataPoint> dpoints = new ArrayList<DataPoint>();// 类族中点集链表
@@ -369,9 +442,8 @@ public class PAppletMDS extends PApplet {
 
 		for (int i = 0; i < cntTmp; i++) // pos数组读入
 		{
-			double[] tmp = { posTmp[i][0] * (w - 60) + 10,
-					posTmp[i][1] * (h - 60) + 10 };
-			// System.out.println(tmp[0] + "  " + tmp[1]);
+			double[] tmp = { posTmp[i][0] * (w - 60) + 10, posTmp[i][1] * (h - 60) + 10 };
+			// System.out.println(tmp[0] + " " + tmp[1]);
 			dpoints.add(new DataPoint(tmp, i + ""));
 		}
 
@@ -478,10 +550,8 @@ public class PAppletMDS extends PApplet {
 							Cluster clusterA = finalClusters.get(i);
 							Cluster clusterB = finalClusters.get(j);
 
-							List<DataPoint> dataPointsA = clusterA
-									.getDataPoints();
-							List<DataPoint> dataPointsB = clusterB
-									.getDataPoints();
+							List<DataPoint> dataPointsA = clusterA.getDataPoints();
+							List<DataPoint> dataPointsB = clusterB.getDataPoints();
 
 							double tmpAx = 0, tmpAy = 0; // 类A重心坐标
 							double tmpBx = 0, tmpBy = 0; // 类B重心坐标
@@ -503,9 +573,8 @@ public class PAppletMDS extends PApplet {
 							tmpBx /= dataPointsB.size();
 							tmpBy /= dataPointsB.size();
 
-							double tempDis = Math.sqrt((tmpAx - tmpBx)
-									* (tmpAx - tmpBx)
-									+ ((tmpAy - tmpBy) * (tmpAy - tmpBy)));
+							double tempDis = Math
+									.sqrt((tmpAx - tmpBx) * (tmpAx - tmpBx) + ((tmpAy - tmpBy) * (tmpAy - tmpBy)));
 							if (tempDis < min) {
 								min = tempDis;
 								mergeIndexA = i;
@@ -530,20 +599,18 @@ public class PAppletMDS extends PApplet {
 							 */
 						}
 					} // end for j
-				}// end for i
+				} // end for i
 					// 合并cluster[mergeIndexA]和cluster[mergeIndexB]
 				if (flag == false)
 					break;
-				finalClusters = mergeCluster(finalClusters, mergeIndexA,
-						mergeIndexB);
+				finalClusters = mergeCluster(finalClusters, mergeIndexA, mergeIndexB);
 
-			}// end while
+			} // end while
 
 			return finalClusters;
 		}
 
-		private List<Cluster> mergeCluster(List<Cluster> clusters,
-				int mergeIndexA, int mergeIndexB) {
+		private List<Cluster> mergeCluster(List<Cluster> clusters, int mergeIndexA, int mergeIndexB) {
 			if (mergeIndexA != mergeIndexB) {
 				// 将cluster[mergeIndexB]中的DataPoint加入到 cluster[mergeIndexA]
 				Cluster clusterA = clusters.get(mergeIndexA);
