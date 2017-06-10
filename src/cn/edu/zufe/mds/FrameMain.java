@@ -27,7 +27,7 @@ public class FrameMain extends JFrame implements ActionListener, ChangeListener,
 	PAppletChinaMap pChinaMap = new PAppletChinaMap(this); //processing中国地图窗体(第一窗口)
 	PAppletMDS pMDS = new PAppletMDS(); //二维MDS(第二窗口)
 	//PAppletISMDS pISMDS = new PAppletISMDS(); //时空混合可视化窗口
-	//PAppletStoryFlow pStory = new PAppletStoryFlow();//(第三窗口)
+//	PAppletStoryFlow pStory = new PAppletStoryFlow();//(第三窗口)
 	PAppletRiver pRiver = new PAppletRiver();//(第三窗口_重构)
 
 	Language lan = new Language();
@@ -179,7 +179,7 @@ public class FrameMain extends JFrame implements ActionListener, ChangeListener,
 //		centerPanel.add(pStory);
 //		pStory.init();
 //		pStory.start();
-		//河流画法的第三窗口
+		//河流画法的第三窗口 //聚类修改为圆
 		pRiver.setPreferredSize(new Dimension(PAppletStoryFlow.yearLen * Data.yearCount, 400));
 		centerPanel.add(pRiver);
 		pRiver.init();

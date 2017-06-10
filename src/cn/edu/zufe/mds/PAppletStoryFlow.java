@@ -259,7 +259,6 @@ public class PAppletStoryFlow extends PApplet {
 //			 bOut = 100;
 
 			pg.stroke(hIn, sIn, bIn);
-			// System.out.println("entropy = " + entropy);
 			pg.line(sPoint.x, sPoint.y, ePoint.x, ePoint.y);
 			pg.stroke(0, 0, 0);
 			pg.strokeWeight(1);

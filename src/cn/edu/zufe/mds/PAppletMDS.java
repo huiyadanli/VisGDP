@@ -6,9 +6,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import cn.edu.zufe.mds.*;
-import cn.edu.zufe.mds.PAppletStoryFlow.SortBySize;
-import cn.edu.zufe.mds.PAppletStoryFlow.StoryParm;
-import cn.edu.zufe.mds.PAppletStoryFlow.StoryLine;
+import cn.edu.zufe.mds.PAppletRiver.SortBySize;
+import cn.edu.zufe.mds.PAppletRiver.Param;
+import cn.edu.zufe.mds.PAppletRiver.RiverLine;
 import mdsj.MDSJ;
 import processing.core.PApplet;
 import processing.core.PGraphics;
@@ -135,10 +135,10 @@ public class PAppletMDS extends PApplet {
 
 		}
 
-		ArrayList<StoryLine> lines = new ArrayList<StoryLine>();
+		ArrayList<RiverLine> lines = new ArrayList<RiverLine>();
 		boolean exist = false;
-		if (PAppletStoryFlow.allYear[0] != null) {
-			lines = (ArrayList<StoryLine>) PAppletStoryFlow.allYear[GlobalVariables.year
+		if (PAppletRiver.allYear[0] != null) {
+			lines = (ArrayList<RiverLine>) PAppletRiver.allYear[GlobalVariables.year
 					- Data.startYear].lineInYear.clone();
 			Collections.sort(lines, new SortByProvIndex());
 			exist = true;
@@ -253,7 +253,7 @@ public class PAppletMDS extends PApplet {
 	}
 
 	public void mousePressed() {
-		PAppletStoryFlow.pressedIn = null;
+		PAppletRiver.pressedIn = null;
 		GlobalVariables.selectCityList3.clear();
 		mouseIn = -1;
 		if (mouseButton == LEFT) {
@@ -359,7 +359,7 @@ public class PAppletMDS extends PApplet {
 			// System.out.println(output[0][i] + " " + output[1][i]);
 			posTmp[i][0] = (output[0][i] - minPosX) / (maxPosX - minPosX);
 			posTmp[i][1] = (output[1][i] - minPosY) / (maxPosY - minPosY);
-			// System.out.println("pos["+i+"][0] = "+pos[i][0]+" pos["+i+"][1] = "+pos[i][1]);
+			System.out.println("pos["+i+"][0] = "+pos[i][0]+" pos["+i+"][1] = "+pos[i][1]);
 		}
 
 		ArrayList<DataPoint> dpoints = new ArrayList<DataPoint>();// 类族中点集链表
@@ -606,9 +606,9 @@ public class PAppletMDS extends PApplet {
 		}
 	}
 
-	public class SortByProvIndex implements Comparator<StoryLine> {
+	public class SortByProvIndex implements Comparator<RiverLine> {
 		@Override
-		public int compare(StoryLine s1, StoryLine s2) {
+		public int compare(RiverLine s1, RiverLine s2) {
 			if (s1.provIndex < s2.provIndex) {
 				return -1;
 			}

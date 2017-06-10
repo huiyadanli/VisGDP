@@ -6,10 +6,10 @@ import java.io.FileReader;
 import cn.edu.zufe.mds.ProvinceName;
 
 public class Data {
-	public static int yearCount = 36; // 1978~2013 //年份数
+	public static int yearCount = 62; // 1978~2013 //年份数 //36 1978  62 1952
 	public static int industryCount = 13; // 产业数
 	public static int provinceCount = 32; // 省份数
-	public static int startYear = 1978; // 起始年份
+	public static int startYear = 1952; // 起始年份
 	public static int indexIndustry[] = { 1, 2, 5, 12 }; // 记录一、二、三产业的Index
 	public static AreaEconomicsInfor[] area = new AreaEconomicsInfor[32];
 	ProvinceName pName = new ProvinceName();
